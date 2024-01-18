@@ -1,3 +1,4 @@
+import { ContentType } from 'scrypt-ord';
 import { Recallable } from './src/contracts/recallable'
 import { getDefaultSigner, randomPrivateKey } from './tests/utils/txHelper'
 import {
@@ -23,15 +24,17 @@ import {
     Recallable.loadArtifact()
 
     recallable = new Recallable(PubKey(alicePublicKey.toByteString()))
+    
+    await recallable.connect(getDefaultSigner())
+    recallable.inscribeImage('logo.png',ContentType.PNG)
 
-    await recallable.connect(getDefaultSigner(alicePrivateKey))
 
     const tx = await recallable.deploy(100)
 
     // Transfer some satoshis from alice to bob
     console.log('deploy txid', tx.id)
 
-    const satoshiSent = 50
+    const satoshiSent = 500
 
     const satoshisLeft = recallable.balance - satoshiSent
 

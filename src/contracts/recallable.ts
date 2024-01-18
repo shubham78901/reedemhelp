@@ -1,3 +1,4 @@
+import { OrdinalNFT } from 'scrypt-ord';
 import {
     assert,
     ByteString,
@@ -12,11 +13,9 @@ import {
     Utils,
 } from 'scrypt-ts'
 
-/*
- * Re-callable satoshis demo.
- * Users can transfer these satoshis as they wish, and the issuer can recall them back to himself at anytime.
- */
-export class Recallable extends SmartContract {
+
+// Create the final Recallable class by applying the mixin to the base class
+export class Recallable extends OrdinalNFT {
     // the public key of issuer
     @prop()
     readonly issuerPubKey: PubKey
@@ -29,12 +28,16 @@ export class Recallable extends SmartContract {
     bobPubKey: PubKey
 
     constructor(issuer: PubKey) {
-        super(...arguments)
-        this.issuerPubKey = issuer
-        this.userPubKey = issuer // the first user is the issuer himself
-        this.bobPubKey = issuer
+        super(); // Call the constructor of the inherited class
+    
+        // Initialize the inherited class with the provided arguments
+        this.init(...arguments);
+    
+        // Your additional initialization logic for the Recallable class
+        this.issuerPubKey = issuer;
+        this.userPubKey = issuer; // the first user is the issuer himself
+        this.bobPubKey = issuer;
     }
-
     @method()
     public transfer(
         userSig: Sig, // the current user should provide his signature before transfer

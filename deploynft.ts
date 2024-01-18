@@ -17,13 +17,13 @@ import { join } from 'path'
 import { ContentType, OrdiMethodCallOptions, OrdiNFTP2PKH } from 'scrypt-ord'
 import { myAddress } from './tests/utils/privateKey'
 function readImage(): string {
-    const path = join(__dirname, '..', '..', 'logo.png')
+    const path = join(__dirname, 'logo.png')
     return readFileSync(path).toString('base64')
 }
 
 async function main() {
     const [alicePrivateKey, alicePublicKey, pkh, myaddress] = randomPrivateKey()
-    HashLockNFT.loadArtifact('tests/artifacts/contracts/hashLockNFT.json')
+    HashLockNFT.loadArtifact("./artifacts/hashLockNFT.json")
 
     // create contract instance
     const message = toByteString('Hello sCrypt', true)
