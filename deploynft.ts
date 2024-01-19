@@ -29,7 +29,7 @@ async function main() {
     const message = toByteString('Hello sCrypt', true)
     const hash = sha256(message)
     const hashLock = new HashLockNFT(hash)
-    await hashLock.connect(getDefaultSigner(alicePrivateKey))
+    await hashLock.connect(getDefaultSigner())
 
     // read image data
     const image = readImage()
