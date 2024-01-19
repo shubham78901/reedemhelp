@@ -24,7 +24,7 @@ const wallets: Record<string, TestWallet> = {
 export function getDefaultSigner(
     privateKey?: bsv.PrivateKey | bsv.PrivateKey[]
 ): TestWallet {
-    const network = process.env.NETWORK || 'local'
+    const network = process.env.NETWORK || 'testnet'
 
     const wallet = wallets[network]
 

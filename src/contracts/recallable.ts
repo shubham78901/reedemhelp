@@ -15,7 +15,7 @@ import {
 
 
 // Create the final Recallable class by applying the mixin to the base class
-export class Recallable extends OrdinalNFT {
+export class Recallable extends SmartContract {
     // the public key of issuer
     @prop()
     readonly issuerPubKey: PubKey
@@ -27,19 +27,14 @@ export class Recallable extends OrdinalNFT {
  
 
 
-
     constructor(issuer: PubKey) {
-        super(); // Call the constructor of the inherited class
-    
-        // Initialize the inherited class with the provided arguments
-        this.init(...arguments);
-    
-        // Your additional initialization logic for the Recallable class
-        this.issuerPubKey = issuer;
-        this.userPubKey = issuer; // the first user is the issuer himself
-   
-      
+        super(...arguments)
+        this.issuerPubKey = issuer
+        this.userPubKey = issuer // the first user is the issuer himself
+ 
+     
     }
+
     @method()
     public transfer(
         userSig1: Sig, // the current user should provide his signature before transfer

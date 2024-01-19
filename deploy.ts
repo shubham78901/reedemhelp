@@ -26,7 +26,7 @@ import {
     recallable = new Recallable(PubKey(alicePublicKey.toByteString()))
     
     await recallable.connect(getDefaultSigner())
-    recallable.inscribeImage('logo.png',ContentType.PNG)
+   
 
 
     const tx = await recallable.deploy(10000)
@@ -53,6 +53,8 @@ import {
     bobNextInstance4.userPubKey = PubKey(bobPublicKey.toByteString())
     bobNextInstance5.userPubKey = PubKey(bobPublicKey.toByteString())
 
+    recallable.connect(getDefaultSigner())
+
     const tranfer = await recallable.methods.transfer(
         (sigResps) => findSig(sigResps, alicePublicKey),
 
@@ -63,10 +65,10 @@ import {
         PubKey(bobPublicKey.toByteString()),
 
         BigInt(1),
-        BigInt(2),
-        BigInt(3),
-        BigInt(4),
-        BigInt(5),
+        BigInt(1),
+        BigInt(1),
+        BigInt(1),
+        BigInt(1),
         {
             pubKeyOrAddrToSign: alicePublicKey,
             next: [
