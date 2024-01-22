@@ -32,19 +32,19 @@ import {
     const tx = await recallable.deploy(10000)
 
     // Transfer some satoshis from alice to bob
+
     console.log('deploy txid', tx.id)
 
     const satoshiSent = 50
 
     const satoshisLeft = recallable.balance - 5
 
-    const aliceNextInstance = recallable.next()
-
-    const bobNextInstance1 = recallable.next()
-    const bobNextInstance2 = recallable.next()
-    const bobNextInstance3 = recallable.next()
-    const bobNextInstance4 = recallable.next()
-    const bobNextInstance5 = recallable.next()
+    const aliceNextInstance =  recallable.next()
+    const bobNextInstance1  =  recallable.next()
+    const bobNextInstance2  =  recallable.next()
+    const bobNextInstance3  =  recallable.next()
+    const bobNextInstance4  =  recallable.next()
+    const bobNextInstance5  =  recallable.next()
 
 
     bobNextInstance1.userPubKey = PubKey(bobPublicKey.toByteString())
@@ -53,7 +53,7 @@ import {
     bobNextInstance4.userPubKey = PubKey(bobPublicKey.toByteString())
     bobNextInstance5.userPubKey = PubKey(bobPublicKey.toByteString())
 
-    recallable.connect(getDefaultSigner())
+
 
     const tranfer = await recallable.methods.transfer(
         (sigResps) => findSig(sigResps, alicePublicKey),
