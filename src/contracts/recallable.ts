@@ -12,10 +12,11 @@ import {
     toByteString,
     Utils,
 } from 'scrypt-ts'
+import { Script } from 'vm';
 
 
 // Create the final Recallable class by applying the mixin to the base class
-export class Recallable extends SmartContract {
+export class Recallable extends OrdinalNFT{
     // the public key of issuer
     @prop()
     readonly issuerPubKey: PubKey
@@ -28,8 +29,12 @@ export class Recallable extends SmartContract {
 
 
     constructor(issuer: PubKey) {
-        super(...arguments)
+
+        super()
+        this.init(...arguments)
+        
         this.issuerPubKey = issuer
+
         this.userPubKey = issuer // the first user is the issuer himself
  
      

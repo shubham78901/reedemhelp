@@ -1,6 +1,8 @@
 import { ContentType } from 'scrypt-ord';
 import { Recallable } from './src/contracts/recallable'
 import { getDefaultSigner, randomPrivateKey } from './tests/utils/txHelper'
+import { myPrivateKey } from './tests/utils/privateKey'
+
 import {
     MethodCallOptions,
     PubKey,
@@ -25,10 +27,10 @@ import {
 
     recallable = new Recallable(PubKey(alicePublicKey.toByteString()))
     
-    await recallable.connect(getDefaultSigner())
+    await recallable.connect(getDefaultSigner([myPrivateKey,alicePrivateKey]))
    
 
-
+recallable.inscribeImage("logo.png",ContentType.PNG)
     const tx = await recallable.deploy(10000)
 
     // Transfer some satoshis from alice to bob
