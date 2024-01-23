@@ -78,11 +78,11 @@ export class Recallable extends SmartContract {
         const satoshisLeft = satoshisTotal - totalSent;
     
         if (satoshisLeft > 0) {
-            this.userPubKey = previousUserPubKey;
-            outputs += this.buildStateOutput(satoshisLeft);
+        
+            outputs += this.buildChangeOutput();
         }
     
-        outputs += this.buildChangeOutput();
+       
     
         // assert(
         //     hash256(outputs) === this.ctx.hashOutputs,
