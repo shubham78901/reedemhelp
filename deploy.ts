@@ -53,8 +53,8 @@ import {
 
     const transfer = await recallable.methods.transfer(
         (sigResps) => findSig(sigResps, alicePublicKey),
-        ...pubKeysArray.map((key) => PubKey(key)),
-        ...Array(5).fill(BigInt(1)),
+        pubKeysArray.map((key) => PubKey(key)),
+    Array(5).fill(BigInt(1)),
         {
             pubKeyOrAddrToSign: alicePublicKey,
             next: [
