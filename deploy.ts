@@ -11,98 +11,66 @@ import {
     buildPublicKeyHashScript,
     findSig,
     hash160,
-} from 'scrypt-ts'
+} from 'scrypt-ts';
+
 ;(async () => {
     // alice is the issuer
-
-    // privateKey, publicKey, publicKeyHash, address]
-    const [alicePrivateKey, alicePublicKey, pkh, myaddress] = randomPrivateKey()
+    const [alicePrivateKey, alicePublicKey, pkh, myaddress] = randomPrivateKey();
 
     // bob is a user
-    const [, bobPublicKey] = randomPrivateKey()
+    const [, bobPublicKey] = randomPrivateKey();
 
-    let recallable: Recallable
+    let recallable: Recallable;
 
-    Recallable.loadArtifact()
+    Recallable.loadArtifact();
 
-    recallable = new Recallable(PubKey(alicePublicKey.toByteString()))
-    
-    await recallable.connect(getDefaultSigner([myPrivateKey,alicePrivateKey]))
-   
+    recallable = new Recallable(PubKey(alicePublicKey.toByteString()));
 
-recallable.inscribeImage("logo.png",ContentType.PNG)
-    const tx = await recallable.deploy(10000)
+    await recallable.connect(getDefaultSigner([myPrivateKey, alicePrivateKey]));
+
+    const tx = await recallable.deploy(10000);
 
     // Transfer some satoshis from alice to bob
+    console.log('deploy txid', tx.id);
 
-    console.log('deploy txid', tx.id)
+    const satoshiSent = 50;
+    const satoshisLeft = recallable.balance - 5;
 
-    const satoshiSent = 50
+    let next: any[] = [];
 
-    const satoshisLeft = recallable.balance - 5
+    // Array of public keys
+    const pubKeysArray = Array(5).fill(bobPublicKey.toByteString());
 
-    const aliceNextInstance =  recallable.next()
-    const bobNextInstance1  =  recallable.next()
-    const bobNextInstance2  =  recallable.next()
-    const bobNextInstance3  =  recallable.next()
-    const bobNextInstance4  =  recallable.next()
-    const bobNextInstance5  =  recallable.next()
+    for (let i = 1; i <= 5; i++) {
+        const bobNextInstance = recallable.next();
+        bobNextInstance.userPubKey = PubKey(bobPublicKey.toByteString());
 
+        next.push({
+            instance: bobNextInstance,
+            balance: 1,
+        });
+    }
 
-    bobNextInstance1.userPubKey = PubKey(bobPublicKey.toByteString())
-    bobNextInstance2.userPubKey = PubKey(bobPublicKey.toByteString())
-    bobNextInstance3.userPubKey = PubKey(bobPublicKey.toByteString())
-    bobNextInstance4.userPubKey = PubKey(bobPublicKey.toByteString())
-    bobNextInstance5.userPubKey = PubKey(bobPublicKey.toByteString())
-
-
-
-    const tranfer = await recallable.methods.transfer(
+    const transfer = await recallable.methods.transfer(
         (sigResps) => findSig(sigResps, alicePublicKey),
-
-        PubKey(bobPublicKey.toByteString()),
-        PubKey(bobPublicKey.toByteString()),
-        PubKey(bobPublicKey.toByteString()),
-        PubKey(bobPublicKey.toByteString()),
-        PubKey(bobPublicKey.toByteString()),
-
-        BigInt(1),
-        BigInt(1),
-        BigInt(1),
-        BigInt(1),
-        BigInt(1),
+        ...pubKeysArray.map((key) => PubKey(key)),
+        ...Array(5).fill(BigInt(1)),
         {
             pubKeyOrAddrToSign: alicePublicKey,
             next: [
+                ...next,
                 {
-                    instance: bobNextInstance1,
-                    balance: 1,
-                },
-                {
-                    instance: bobNextInstance2,
-                    balance: 1,
-                },
-                {
-                    instance: bobNextInstance3,
-                    balance: 1,
-                },
-                {
-                    instance: bobNextInstance4,
-                    balance: 1,
-                },
-                 {
-                    instance: bobNextInstance5,
-                    balance: 1,
-                },
-                {
-                    instance: aliceNextInstance,
+                    instance: recallable.next(),
                     balance: satoshisLeft,
                 },
             ],
         } as MethodCallOptions<Recallable>
-    )
+    );
 
-    console.log('transfer txid', tranfer.tx.id)
+    console.log('transfer txid', transfer.tx.id);
+})();
+
+
     // Recall some satoshis from bob back to alice
     // const aliceRecallInstance = bobNextInstance.next()
     // aliceRecallInstance.userPubKey = PubKey(alicePublicKey.toByteString())
@@ -156,4 +124,4 @@ recallable.inscribeImage("logo.png",ContentType.PNG)
     // )
     // console.log('recallable txid', callTx.id)
     // console.log('recallable txid', callTx.toString())
-})()
+// })();

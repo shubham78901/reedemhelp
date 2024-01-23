@@ -2,6 +2,7 @@ import { OrdinalNFT } from 'scrypt-ord';
 import {
     assert,
     ByteString,
+    FixedArray,
     hash160,
     hash256,
     method,
@@ -12,11 +13,10 @@ import {
     toByteString,
     Utils,
 } from 'scrypt-ts'
-import { Script } from 'vm';
 
 
 // Create the final Recallable class by applying the mixin to the base class
-export class Recallable extends OrdinalNFT{
+export class Recallable extends SmartContract {
     // the public key of issuer
     @prop()
     readonly issuerPubKey: PubKey
@@ -29,81 +29,59 @@ export class Recallable extends OrdinalNFT{
 
 
     constructor(issuer: PubKey) {
-
-        super()
-        this.init(...arguments)
-        
+        super(...arguments)
         this.issuerPubKey = issuer
-
         this.userPubKey = issuer // the first user is the issuer himself
  
      
     }
-
     @method()
     public transfer(
-        userSig1: Sig, // the current user should provide his signature before transfer
-     
-        receiverPubKey1: PubKey, // send to
-        receiverPubKey2: PubKey,
-        receiverPubKey3: PubKey,
-        receiverPubKey4: PubKey,
-        receiverPubKey5: PubKey,
-        satoshisSent1: bigint ,// send amount
-        satoshisSent2: bigint ,// send amount
-        satoshisSent3: bigint, // send amount
-        satoshisSent4: bigint, // send amount
-        satoshisSent5: bigint ,// send amount
+        userSig: Sig,
+        pubKeys: FixedArray<PubKey, 5>,
+        satoshisSentList: FixedArray<bigint, 5>,
+        
     ) {
-        // total satoshis locked in this contract utxo
-        const satoshisTotal = this.ctx.utxo.value
-        // require the amount requested to be transferred is valid
-        const satoshisSent=satoshisSent1+satoshisSent2+satoshisSent3+satoshisSent4+satoshisSent5
-
-        assert(
-            satoshisSent > 0 && satoshisSent <= satoshisTotal,
-            `invalid value of \`satoshisSent\`, should be greater than 0 and less than or equal to ${satoshisTotal}`
-        )
-
-        // require the current user to provide signature before transfer
-        assert(
-            this.checkSig(userSig1, this.userPubKey),
-            "user's signature check failed"
-        )
-     
-        // temp record previous user
-
-        const previousUserPubKey1 = this.userPubKey
-      
-
-        // construct all the outputs of the method calling tx
-
-        // the output send to `receiver`
-        this.userPubKey = receiverPubKey1
-     
-     
-        let outputs = this.buildStateOutput(satoshisSent1)
-        outputs+=this.buildStateOutput(satoshisSent2)
-        outputs+=this.buildStateOutput(satoshisSent3)
-        outputs+=this.buildStateOutput(satoshisSent4)
-        outputs+=this.buildStateOutput(satoshisSent5)
-
-        // the change output back to previous `user`
-        const satoshisLeft = satoshisTotal - satoshisSent
-        if (satoshisLeft > 0) {
-            this.userPubKey= previousUserPubKey1
-            outputs += this.buildStateOutput(satoshisLeft)
+        const satoshisTotal = this.ctx.utxo.value;
+    
+        let totalSent: bigint = BigInt(0);
+        for (let i: any = 0; i < 5; i++) {
+            
+            totalSent += satoshisSentList[i];
         }
-
-        // the change output for paying the transaction fee
-        outputs += this.buildChangeOutput()
-
-        // require all of these outputs are actually in the unlocking transaction
+    
         assert(
-            hash256(outputs) == this.ctx.hashOutputs,
+            totalSent > 0 && totalSent <= satoshisTotal,
+            `Invalid value of \`satoshisSent\`, should be greater than 0 and less than or equal to ${satoshisTotal}`
+        );
+    
+        assert(
+            this.checkSig(userSig, this.userPubKey),
+            "User's signature check failed"
+        );
+    
+        const previousUserPubKey = this.userPubKey;
+    
+        let outputs: any = toByteString('');
+        for (let i: any = 0; i < 5; i++) {
+            outputs += this.buildStateOutput(satoshisSentList[i]);
+        }
+    
+        const satoshisLeft = satoshisTotal - totalSent;
+    
+        if (satoshisLeft > 0) {
+            this.userPubKey = previousUserPubKey;
+            outputs += this.buildStateOutput(satoshisLeft);
+        }
+    
+        outputs += this.buildChangeOutput();
+    
+        assert(
+            hash256(outputs) === this.ctx.hashOutputs,
             'hashOutputs check failed'
-        )
+        );
     }
+    
 
     @method()
     public recall(issuerSig: Sig) {
