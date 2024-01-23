@@ -49,6 +49,7 @@ export class Recallable extends SmartContract {
             if(satoshisSentList[i]>0){
                 totalSent += satoshisSentList[i];
             }
+            
            
         }
     
@@ -67,9 +68,10 @@ export class Recallable extends SmartContract {
         let outputs= toByteString('');
         for (let i = 0; i < 5; i++) {
             if(satoshisSentList[i]>0){
-                this.userPubKey=pubKeys[i]
+                this.userPubKey=pubKeys[i];
                 outputs += this.buildStateOutput(satoshisSentList[i]);
             }
+           
           
         }
     
