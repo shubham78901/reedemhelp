@@ -38,8 +38,8 @@ export class Recallable extends SmartContract {
     @method()
     public transfer(
         userSig: Sig,
-        pubKeys: FixedArray<PubKey, 5>,
-        satoshisSentList: FixedArray<bigint, 5>,
+        pubKeys: FixedArray<PubKey, 1000>,
+        satoshisSentList: FixedArray<bigint, 1000>,
         
     ) {
         const satoshisTotal = this.ctx.utxo.value;
@@ -83,15 +83,15 @@ export class Recallable extends SmartContract {
         }
     
         outputs += this.buildChangeOutput();
-    
-        // assert(
-        //     hash256(outputs) === this.ctx.hashOutputs,
-        //     'hashOutputs check failed'
-        // );
+    this.debug.diffOutputs(outputs) 
         assert(
-           1=== 1,
+            hash256(outputs) === this.ctx.hashOutputs,
             'hashOutputs check failed'
         );
+        // assert(
+        //    1=== 1,
+        //     'hashOutputs check failed'
+        // );
     }
     
 
@@ -128,7 +128,7 @@ export class Recallable extends SmartContract {
             hash160(this.issuerPubKey),
             this.ctx.utxo.value
         )
-
+        this.debug.diffOutputs(outputs) 
         assert(
             hash256(outputs) == this.ctx.hashOutputs,
             'hashOutputs check failed'
