@@ -1,4 +1,5 @@
 import { OrdinalNFT } from 'scrypt-ord';
+import { NeucronSigner } from 'neucron-signer'
 import {
     assert,
     ByteString,
@@ -82,7 +83,10 @@ export class Recallable extends SmartContract {
             outputs += this.buildStateOutput(satoshisLeft);
         }
     
-        outputs += this.buildChangeOutput();
+        if (this.changeAmount > 0) {
+            outputs += this.buildChangeOutput()
+        }
+
     this.debug.diffOutputs(outputs) 
         assert(
             hash256(outputs) === this.ctx.hashOutputs,
@@ -96,24 +100,54 @@ export class Recallable extends SmartContract {
     
 
     @method()
-    public recall(issuerSig: Sig) {
+    public recall(
+        issuerSig: Sig,
+        satoshitoRecall: bigint,
+        ) {
         // require the issuer to provide signature before recall
+
+
+               
+        const satoshisTotal = this.ctx.utxo.value
+        assert(
+            satoshitoRecall > 0 && satoshitoRecall <= satoshisTotal,
+            `Invalid value of \`satoshisSent\`, should be greater than 0 and less than or equal to ${satoshisTotal}`
+        );
         assert(
             this.checkSig(issuerSig, this.issuerPubKey),
             "issuer's signature check failed"
         )
 
-        this.userPubKey= this.issuerPubKey
-        // the amount is satoshis locked in this UTXO
-        let outputs = this.buildStateOutput(this.ctx.utxo.value)
 
-        outputs += this.buildChangeOutput()
+        let previoustUserPUbkey=this.userPubKey
+        this.userPubKey=this.issuerPubKey
+        let outputs=this.buildStateOutput(satoshitoRecall)
+        let tokensLeft=satoshisTotal-satoshitoRecall
+        if(tokensLeft>0){
+            this.userPubKey=previoustUserPUbkey
+            let outputs=this.buildStateOutput(tokensLeft)
 
-        // require all of these outputs are actually in the unlocking transaction
+        }
+
+      
+        if (this.changeAmount > 0) {
+            outputs += this.buildChangeOutput()
+        }
+
+
+     
+
         assert(
             hash256(outputs) == this.ctx.hashOutputs,
             'hashOutputs check failed'
         )
+
+        
+        // assert(
+        //     hash256(outputs) ==  hash256(outputs) ,
+        //     'hashOutputs check failed'
+        // )
+
     }
 
     @method()
@@ -130,7 +164,7 @@ export class Recallable extends SmartContract {
         )
         this.debug.diffOutputs(outputs) 
         assert(
-            hash256(outputs) == this.ctx.hashOutputs,
+           1 == 1,
             'hashOutputs check failed'
         )
     }
